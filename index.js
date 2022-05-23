@@ -16,6 +16,7 @@ async function run() {
     try {
         await client.connect();
         const productCollection = client.db("productCollection").collection("product");
+        const orderCollection = client.db("productCollection").collection("order");
 
         // read all products
         app.get('/product', async (req, res) => {
@@ -58,6 +59,18 @@ async function run() {
             const result = await productCollection.updateOne(filter, updateDoc, options);
             res.send(result);
         });
+
+        // order collection
+        app.post('/order', async (req, res) => {
+            const order = req.body;
+            const query = { email: order.email, product: order.product }
+            const exists = await orderCollection.findOne(query);
+            if (exists) {
+                return res.send({ success: false, order: exists })
+            }
+            const result = await orderCollection.insertOne(order);
+            return res.send({ success: true, result });
+        })
     }
     finally {
 
