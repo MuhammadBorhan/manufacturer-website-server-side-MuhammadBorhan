@@ -32,6 +32,32 @@ async function run() {
             const product = await productCollection.findOne(query);
             res.send(product);
         });
+
+
+        // Update quantity with previous quantity
+        app.put('/product/:id', async (req, res) => {
+            const id = req.params.id;
+            const user = req.body;
+            const filter = { _id: ObjectId(id) };
+            const options = { upsert: true };
+            let updateDoc;
+            if (user.increseQuantity) {
+                updateDoc = {
+                    $set: {
+                        minQuantity: user.increseQuantity,
+                    },
+                }
+            }
+            else {
+                updateDoc = {
+                    $set: {
+                        minQuantity: user.reduceQuantity,
+                    },
+                }
+            }
+            const result = await productCollection.updateOne(filter, updateDoc, options);
+            res.send(result);
+        });
     }
     finally {
 
