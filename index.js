@@ -18,6 +18,13 @@ async function run() {
         const productCollection = client.db("productCollection").collection("product");
         const orderCollection = client.db("productCollection").collection("order");
 
+        // post new item
+        app.post('/product', async (req, res) => {
+            const newItem = req.body;
+            const add = await productCollection.insertOne(newItem);
+            res.send(add);
+        });
+
         // read all products
         app.get('/product', async (req, res) => {
             const query = {};
