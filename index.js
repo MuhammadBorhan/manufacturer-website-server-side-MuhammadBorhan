@@ -70,7 +70,16 @@ async function run() {
             }
             const result = await orderCollection.insertOne(order);
             return res.send({ success: true, result });
-        })
+        });
+
+        // Read my order product using email
+        app.get('/order', async (req, res) => {
+            const email = req.query.email;
+            const query = { email: email };
+            const cursor = orderCollection.find(query);
+            const myOrder = await cursor.toArray();
+            res.send(myOrder);
+        });
     }
     finally {
 
