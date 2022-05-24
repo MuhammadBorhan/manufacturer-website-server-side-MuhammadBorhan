@@ -72,6 +72,14 @@ async function run() {
             return res.send({ success: true, result });
         });
 
+        // Read all order product
+        app.get('/order', async (req, res) => {
+            const query = {};
+            const cursor = orderCollection.find(query);
+            const myOrder = await cursor.toArray();
+            res.send(myOrder);
+        });
+
         // Read my order product using email
         app.get('/orders', async (req, res) => {
             const email = req.query.email;
