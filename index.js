@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 const port = process.env.PORT || 5000;
@@ -12,6 +13,22 @@ app.use(express.json());
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.dor1v.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
+
+function verifyJWT(req, res, net) {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+        return res.status(401).send({ message: 'UnAuthorized Access' });
+    }
+    const token = authHeader.split(' ')[1];
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decoded) {
+        if (err) {
+            return res.status(403).send({ message: 'Forbidden Access' });
+        }
+        req.decoded = decoded;
+        net();
+    })
+}
+
 async function run() {
     try {
         await client.connect();
@@ -19,6 +36,23 @@ async function run() {
         const orderCollection = client.db("productCollection").collection("order");
         const reviewCollection = client.db("productCollection").collection("review");
         const profileCollection = client.db("productCollection").collection("profile");
+        const userCollection = client.db("productCollection").collection("user");
+
+
+        // jasonwebtoken
+        app.put('/user/:email', async (req, res) => {
+            const email = req.params.email;
+            const user = req.body;
+            const filter = { email: (email) };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: user,
+            };
+            const result = await userCollection.updateOne(filter, updateDoc, options);
+            const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET)
+            res.send({ result, token });
+        })
+
 
         // post new item
         app.post('/product', async (req, res) => {
@@ -47,6 +81,14 @@ async function run() {
             const cursor = reviewCollection.find(query);
             const reviews = await cursor.toArray();
             res.send(reviews);
+        });
+
+        // read all users
+        app.get('/user', async (req, res) => {
+            const query = {};
+            const cursor = userCollection.find(query);
+            const users = await cursor.toArray();
+            res.send(users);
         });
 
         // read profile
@@ -121,12 +163,18 @@ async function run() {
         });
 
         // Read my order product using email
-        app.get('/orders', async (req, res) => {
+        app.get('/orders', verifyJWT, async (req, res) => {
             const email = req.query.email;
-            const query = { email: email };
-            const cursor = orderCollection.find(query);
-            const myOrder = await cursor.toArray();
-            res.send(myOrder);
+            const decodedEmail = req.decoded.email;
+            if (email === decodedEmail) {
+                const query = { email: email };
+                const cursor = orderCollection.find(query);
+                const myOrder = await cursor.toArray();
+                return res.send(myOrder);
+            }
+            else {
+                return res.status(403).send({ message: 'Forbidden Access' });
+            }
         });
 
         // Delete single product
