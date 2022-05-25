@@ -52,14 +52,14 @@ async function run() {
             if (user.increseQuantity) {
                 updateDoc = {
                     $set: {
-                        minQuantity: user.increseQuantity,
+                        avlbQuantity: user.increseQuantity,
                     },
                 }
             }
             else {
                 updateDoc = {
                     $set: {
-                        minQuantity: user.reduceQuantity,
+                        avlbQuantity: user.reduceQuantity,
                     },
                 }
             }
