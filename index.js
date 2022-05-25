@@ -18,6 +18,7 @@ async function run() {
         const productCollection = client.db("productCollection").collection("product");
         const orderCollection = client.db("productCollection").collection("order");
         const reviewCollection = client.db("productCollection").collection("review");
+        const profileCollection = client.db("productCollection").collection("profile");
 
         // post new item
         app.post('/product', async (req, res) => {
@@ -31,6 +32,13 @@ async function run() {
             const newReview = req.body;
             const addReview = await reviewCollection.insertOne(newReview);
             res.send(addReview);
+        });
+
+        // post profile item
+        app.post('/profile', async (req, res) => {
+            const newProfile = req.body;
+            const addProfile = await profileCollection.insertOne(newProfile);
+            res.send(addProfile);
         });
 
         // read all review
