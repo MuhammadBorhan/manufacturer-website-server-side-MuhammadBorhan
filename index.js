@@ -33,6 +33,15 @@ async function run() {
             res.send(addReview);
         });
 
+        // read all review
+        app.get('/review', async (req, res) => {
+            const query = {};
+            const cursor = reviewCollection.find(query);
+            const reviews = await cursor.toArray();
+            res.send(reviews);
+        });
+
+
         // read all products
         app.get('/product', async (req, res) => {
             const query = {};
