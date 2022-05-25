@@ -49,6 +49,14 @@ async function run() {
             res.send(reviews);
         });
 
+        // read profile
+        app.get('/profile', async (req, res) => {
+            const query = {};
+            const cursor = profileCollection.find(query);
+            const reviews = await cursor.toArray();
+            res.send(reviews);
+        });
+
 
         // read all products
         app.get('/product', async (req, res) => {
