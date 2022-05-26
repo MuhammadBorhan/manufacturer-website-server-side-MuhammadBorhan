@@ -203,6 +203,14 @@ async function run() {
             }
         });
 
+        // read user for payment from my orders
+        app.get('/order/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const order = await orderCollection.findOne(query);
+            res.send(order);
+        })
+
         // Delete single product
         app.delete('/myorder/:id', async (req, res) => {
             const id = req.params.id;
