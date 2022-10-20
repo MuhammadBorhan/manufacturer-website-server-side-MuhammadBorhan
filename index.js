@@ -12,6 +12,7 @@ app.use(cors());
 app.use(express.json());
 
 
+// const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.dor1v.mongodb.net/?retryWrites=true&w=majority`;
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.dor1v.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
@@ -250,7 +251,7 @@ run().catch(console.dir)
 
 
 app.get('/', (req, res) => {
-    res.send('hey this is my final project');
+    res.send('hey this is my final project for manufacture website');
 });
 app.listen(port, () => {
     console.log('Listen to port', port);
